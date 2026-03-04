@@ -73,6 +73,25 @@ model PlaceImageError {
   createdAt DateTime @default(now())
 }
 
+model ImageAudit {
+  id              String   @id @default(uuid())
+  entityType      String   // place, stay, tour, dining, nightlife
+  entityId        String
+  name            String
+  imageUrl        String?
+  status          String   @default("pending") // ok, missing, broken, blocked, not_image, too_small
+  httpCode        Int?
+  notes           String?
+  source          String?  // official, wikimedia, tripadvisor, maps, unsplash
+  sourcePageUrl   String?
+  dimensions      String?  // e.g. 1920x1080
+  checkedAt       DateTime @default(now())
+  verifiedAt      DateTime?
+
+  @@index([status])
+  @@index([entityType, entityId])
+}
+
 model Review {
   id        String   @id @default(uuid())
   placeId   String

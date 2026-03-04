@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { MapPin, Star, ExternalLink } from "lucide-react";
@@ -31,6 +32,7 @@ export function PlaceCard({
     websiteUrl,
     source,
 }: PlaceCardProps) {
+    const [imgError, setImgError] = useState(false);
     const typeColors: Record<string, string> = {
         hotel: "bg-blue-500/90",
         guesthouse: "bg-emerald-500/90",
@@ -47,17 +49,19 @@ export function PlaceCard({
             className="block bg-white rounded-[2rem] shadow-xl shadow-gray-200/40 overflow-hidden border border-gray-50 active:scale-[0.98] transition-all duration-300 group"
         >
             <div className="relative overflow-hidden h-52">
-                {heroImage ? (
+                {heroImage && !imgError ? (
                     <Image
                         src={heroImage}
                         alt={name}
                         fill
                         className="object-cover group-hover:scale-110 transition-transform duration-700"
                         sizes="(max-width: 512px) 100vw, 512px"
+                        onError={() => setImgError(true)}
                     />
                 ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
-                        <span className="text-4xl">🏛️</span>
+                    <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex flex-col items-center justify-center opacity-80">
+                        <span className="text-4xl opacity-30 grayscale transition-all group-hover:grayscale-0 group-hover:scale-110 duration-700">🏛️</span>
+                        <span className="mt-2 text-[8px] font-black uppercase tracking-widest text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">Image Pending</span>
                     </div>
                 )}
 
