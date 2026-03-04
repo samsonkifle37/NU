@@ -34,10 +34,15 @@ model Place {
   longitude        Float?
   websiteUrl       String?
   bookingUrl       String?
+  googleMapsUrl    String?
   phone            String?
   email            String?
   tags             String[]     @default([])
   source           String       @default("manual-seed")
+  status           String       @default("APPROVED")
+  priceLevel       String?
+  neighborhood     String?
+  featured         Boolean      @default(false)
   isActive         Boolean      @default(true)
   createdAt        DateTime     @default(now())
   updatedAt        DateTime     @updatedAt
@@ -45,6 +50,7 @@ model Place {
   favorites        Favorite[]
   reviews          Review[]
   hostListings     HostListing[]
+  imageErrors      PlaceImageError[]
 }
 
 model PlaceImage {
@@ -56,6 +62,15 @@ model PlaceImage {
   altText       String?
   priority      Int      @default(0)  // 0 = hero, higher = gallery
   createdAt     DateTime @default(now())
+}
+
+model PlaceImageError {
+  id        String   @id @default(uuid())
+  placeId   String
+  place     Place    @relation(fields: [placeId], references: [id], onDelete: Cascade)
+  imageUrl  String
+  errorType String   @default("404")
+  createdAt DateTime @default(now())
 }
 
 model Review {

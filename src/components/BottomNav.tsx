@@ -8,13 +8,15 @@ import {
     Map,
     Car,
     User,
+    Compass,
 } from "lucide-react";
 
 const navItems = [
     { href: "/", icon: Home, label: "Home" },
+    { href: "/explore", icon: Compass, label: "Explore" },
     { href: "/stays", icon: BedDouble, label: "Stays" },
     { href: "/tours", icon: Map, label: "Tours" },
-    { href: "/transport", icon: Car, label: "Transport" },
+    { href: "/transport", icon: Car, label: "Trans" },
     { href: "/profile", icon: User, label: "Profile" },
 ];
 
@@ -32,8 +34,8 @@ export function BottomNav() {
                             key={href}
                             href={href}
                             className={`flex flex-col items-center gap-0.5 py-1.5 px-3 rounded-2xl transition-all duration-300 ${isActive
-                                    ? "text-ethiopia-green"
-                                    : "text-gray-400 hover:text-gray-600"
+                                ? "text-ethiopia-green"
+                                : "text-gray-400 hover:text-gray-600"
                                 }`}
                         >
                             <Icon
