@@ -49,6 +49,7 @@ interface PlaceDetail {
     longDescription: string | null;
     websiteUrl: string | null;
     bookingUrl: string | null;
+    googleMapsUrl: string | null;
     phone: string | null;
     email: string | null;
     tags: string[];
@@ -309,6 +310,17 @@ export default function PlaceDetailPage() {
                                 <h3 className="text-sm font-black uppercase tracking-wider text-gray-900 mb-1">
                                     Contact & Links
                                 </h3>
+
+                                {place.googleMapsUrl && (
+                                    <button
+                                        onClick={() => browser.open(place.googleMapsUrl!, place.name + " — Maps")}
+                                        className="flex items-center gap-3 text-sm text-gray-600 hover:text-ethiopia-green transition-colors group w-full text-left"
+                                    >
+                                        <MapPin className="w-4 h-4 text-gray-400 group-hover:text-ethiopia-green" />
+                                        <span className="font-medium truncate flex-1">Open in Maps</span>
+                                        <ChevronRight className="w-4 h-4 text-gray-300" />
+                                    </button>
+                                )}
                                 {place.websiteUrl && (
                                     <button
                                         onClick={() => browser.open(place.websiteUrl!, place.name + " — Website")}
@@ -346,6 +358,12 @@ export default function PlaceDetailPage() {
                                         <Mail className="w-4 h-4 text-gray-400" />
                                         <span className="font-medium">{place.email}</span>
                                     </a>
+                                )}
+
+                                {!place.websiteUrl && !place.bookingUrl && !place.phone && !place.email && (
+                                    <div className="text-[10px] text-gray-400 font-medium italic mt-2">
+                                        More contact details coming soon.
+                                    </div>
                                 )}
                             </div>
 

@@ -21,6 +21,11 @@ interface AuditItem {
     status: string;
     httpCode: number | null;
     notes: string | null;
+    primaryImagePresent: boolean;
+    galleryCount: number;
+    mapsLinkPresent: boolean;
+    websitePresent: boolean;
+    contactDetailsPresent: boolean;
 }
 
 export default function ImageRepairCenter() {
@@ -184,6 +189,25 @@ export default function ImageRepairCenter() {
                                                 }`}>{item.notes}</p>
                                         </div>
                                     )}
+
+                                    {/* Entity Content Completeness Dashboard */}
+                                    <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-gray-100">
+                                        <div className={`text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded-md flex items-center gap-1 ${item.primaryImagePresent ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-rose-50 text-rose-600 border border-rose-100'}`}>
+                                            {item.primaryImagePresent ? <CheckCircle className="w-3 h-3" /> : <XCircle className="w-3 h-3" />} Primary Image
+                                        </div>
+                                        <div className="text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded-md bg-gray-50 text-gray-600 border border-gray-200 flex items-center gap-1">
+                                            <ImageIcon className="w-3 h-3" /> Gallery: {item.galleryCount}
+                                        </div>
+                                        <div className={`text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded-md flex items-center gap-1 ${item.mapsLinkPresent ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-rose-50 text-rose-600 border border-rose-100'}`}>
+                                            {item.mapsLinkPresent ? <CheckCircle className="w-3 h-3" /> : <XCircle className="w-3 h-3" />} Maps Link
+                                        </div>
+                                        <div className={`text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded-md flex items-center gap-1 ${item.websitePresent ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-gray-50 text-gray-400 border border-gray-100'}`}>
+                                            {item.websitePresent ? <CheckCircle className="w-3 h-3" /> : <XCircle className="w-3 h-3" />} Website
+                                        </div>
+                                        <div className={`text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded-md flex items-center gap-1 ${item.contactDetailsPresent ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-gray-50 text-gray-400 border border-gray-100'}`}>
+                                            {item.contactDetailsPresent ? <CheckCircle className="w-3 h-3" /> : <XCircle className="w-3 h-3" />} Contact Details
+                                        </div>
+                                    </div>
 
                                     <div className="mt-4 flex flex-col gap-2">
                                         <div className="flex gap-2">
