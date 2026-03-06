@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { PlaceCard } from "./PlaceCard";
 import { Search, Filter } from "lucide-react";
+import { getPrimaryImage } from "@/lib/images";
 
 interface PlaceGridProps {
     title: string;
@@ -25,7 +26,8 @@ interface PlaceData {
     tags: string[];
     websiteUrl: string | null;
     source: string;
-    images: { imageUrl: string }[];
+    images: { imageUrl: string; priority?: number }[];
+    auditStatus?: "ok" | "missing" | "blocked" | "broken" | null;
 }
 
 interface PlacesResponse {
@@ -146,11 +148,12 @@ export function PlaceGrid({
                             city={place.city}
                             area={place.area}
                             shortDescription={place.shortDescription}
-                            heroImage={place.images[0]?.imageUrl || null}
+                            heroImage={getPrimaryImage(place)}
                             avgRating={place.avgRating}
                             tags={place.tags}
                             websiteUrl={place.websiteUrl}
                             source={place.source}
+                            auditStatus={place.auditStatus}
                         />
                     ))
                 )}

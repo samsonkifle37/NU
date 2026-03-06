@@ -5,6 +5,7 @@ import { Search, Filter, Map, Link as LinkIcon, Share2, Navigation } from "lucid
 import Link from "next/link";
 import { VerifiedImage } from "@/components/media/VerifiedImage";
 import { BottomNav } from "@/components/BottomNav";
+import { getPrimaryImage } from "@/lib/images";
 
 interface Place {
     id: string;
@@ -146,7 +147,7 @@ export function ExploreClient() {
 }
 
 function PlaceCard({ place, onClick }: { place: Place, onClick: () => void }) {
-    const imageUrl = place.images?.[0]?.imageUrl || "";
+    const imageUrl = getPrimaryImage(place) || "";
 
     return (
         <div
@@ -178,7 +179,7 @@ function PlaceCard({ place, onClick }: { place: Place, onClick: () => void }) {
 }
 
 function PlaceModal({ place, onClose }: { place: Place, onClose: () => void }) {
-    const imageUrl = place.images?.[0]?.imageUrl || "";
+    const imageUrl = getPrimaryImage(place) || "";
 
     return (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4">

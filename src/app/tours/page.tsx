@@ -1,20 +1,25 @@
 import { PlaceGrid } from "@/components/PlaceGrid";
 
 export const metadata = {
-    title: "Tours — AddisView",
-    description: "Explore Ethiopia's iconic destinations — Lalibela, Danakil, Bale Mountains, and more.",
+    title: "Tours & Experiences — AddisView",
+    description: "Discover guided tours, museums, parks, markets, and cultural experiences across Ethiopia.",
 };
 
 export default function ToursPage() {
     return (
         <PlaceGrid
-            title="Explore Tours"
-            types="tour"
+            title="Tours & Experiences"
+            types="tour,park,market,coffee,museum,culture,nightlife,tour_operator"
             filterOptions={[
-                { value: "", label: "All Tours" },
-                { value: "tour", label: "Destinations" },
+                { value: "", label: "All" },
+                { value: "must-see", label: "Must-See" },
+                { value: "tour", label: "Tours" },
+                { value: "park", label: "Parks" },
+                { value: "market", label: "Markets" },
+                { value: "coffee", label: "Coffee" },
+                { value: "museum", label: "Culture" },
             ]}
-            searchPlaceholder="Lalibela, nature, hiking..."
+            searchPlaceholder="Lalibela, parks, coffee..."
             accentColor="orange-500"
         />
     );

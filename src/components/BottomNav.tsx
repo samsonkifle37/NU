@@ -13,7 +13,6 @@ import {
 
 const navItems = [
     { href: "/", icon: Home, label: "Home" },
-    { href: "/explore", icon: Compass, label: "Explore" },
     { href: "/stays", icon: BedDouble, label: "Stays" },
     { href: "/tours", icon: Map, label: "Tours" },
     { href: "/transport", icon: Car, label: "Trans" },

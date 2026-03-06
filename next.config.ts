@@ -21,6 +21,15 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: '/explore',
+        destination: '/tours',
+        permanent: true,
+      },
+    ]
+  },
 };
 
 export default nextConfig;

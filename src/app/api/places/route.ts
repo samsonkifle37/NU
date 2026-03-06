@@ -15,7 +15,16 @@ export async function GET(request: NextRequest) {
 
         if (type) {
             const types = type.split(",").map((t) => t.trim());
-            where.type = { in: types };
+            // Support special "must-see" filter that was available on the explore page
+            if (types.includes("must-see")) {
+                where.featured = true;
+                const otherTypes = types.filter(t => t !== "must-see");
+                if (otherTypes.length > 0) {
+                    where.type = { in: otherTypes };
+                }
+            } else {
+                where.type = { in: types };
+            }
         }
 
         if (city) {

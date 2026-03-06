@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { VerifiedImage } from "@/components/media/VerifiedImage";
+import { getPrimaryImage } from "@/lib/images";
 import { useQuery } from "@tanstack/react-query";
 import {
   Search,
@@ -143,7 +144,7 @@ function PlaceSection({
             >
               <div className="relative h-32 overflow-hidden">
                 <VerifiedImage
-                  src={place.images[0]?.imageUrl}
+                  src={getPrimaryImage(place)}
                   alt={place.name}
                   className="w-full h-full group-hover:scale-110 transition-transform duration-500"
                   entityType={place.type as any}
@@ -221,8 +222,8 @@ export default function HomePage() {
         accent="ethiopia-green"
       />
       <PlaceSection
-        title="Popular Tours"
-        types="tour"
+        title="Tours & Experiences"
+        types="tour,park,market,coffee,museum,culture,nightlife,tour_operator"
         href="/tours"
         accent="orange-500"
       />

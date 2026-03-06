@@ -19,6 +19,7 @@ import {
 import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { useInAppBrowser } from "@/components/InAppBrowser";
+import { getPrimaryImage } from "@/lib/images";
 
 interface PlaceImage {
     id: string;
@@ -73,6 +74,12 @@ export default function PlaceDetailPage() {
     const [activeTab, setActiveTab] = useState<"overview" | "gallery" | "reviews">("overview");
     const [isSaved, setIsSaved] = useState(false);
 
+    // Review form state
+    const [rating, setRating] = useState(0);
+    const [hoverRating, setHoverRating] = useState(0);
+    const [reviewComment, setReviewComment] = useState("");
+    const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+
     const { data: place, isLoading, error } = useQuery({
         queryKey: ["place", slug],
         queryFn: () => fetchPlace(slug),
@@ -114,6 +121,28 @@ export default function PlaceDetailPage() {
         },
     });
 
+    const submitReview = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!rating) return;
+        setIsSubmittingReview(true);
+        try {
+            const res = await fetch(`/api/places/${slug}/reviews`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ rating, comment: reviewComment }),
+            });
+            if (res.ok) {
+                setRating(0);
+                setReviewComment("");
+                queryClient.invalidateQueries({ queryKey: ["place", slug] });
+            } else {
+                alert("Failed to post review. Please try again.");
+            }
+        } finally {
+            setIsSubmittingReview(false);
+        }
+    };
+
     if (isLoading) {
         return (
             <div className="pt-4 space-y-4">
@@ -147,7 +176,14 @@ export default function PlaceDetailPage() {
         resort: "bg-teal-500",
     };
 
-    const heroImage = place.images[0]?.imageUrl;
+    const heroImage = getPrimaryImage(place);
+
+    // Curated factual fallback for places with only short descriptions
+    let displayDescription = place.longDescription;
+    if (!displayDescription && place.shortDescription) {
+        const typeNoun = place.type.replace('_', ' ');
+        displayDescription = `${place.shortDescription} Located in ${place.area ? `${place.area}, ` : ""}${place.city}, this ${typeNoun} offers visitors an authentic experience. Whether you're looking to explore the local atmosphere or simply enjoy the surroundings, it's a great choice for travelers.`;
+    }
 
     return (
         <div className="space-y-0 -mx-4">
@@ -243,13 +279,13 @@ export default function PlaceDetailPage() {
                     {activeTab === "overview" && (
                         <>
                             {/* Description */}
-                            {place.longDescription && (
+                            {displayDescription && (
                                 <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-50">
                                     <h3 className="text-sm font-black uppercase tracking-wider text-gray-900 mb-3">
                                         About
                                     </h3>
                                     <p className="text-sm text-gray-600 leading-relaxed font-medium">
-                                        {place.longDescription}
+                                        {displayDescription}
                                     </p>
                                 </div>
                             )}
@@ -337,7 +373,11 @@ export default function PlaceDetailPage() {
 
                     {activeTab === "gallery" && (
                         <div className="grid grid-cols-2 gap-3">
-                            {place.images.map((img) => (
+                            {place.images.filter((img) =>
+                                !img.imageUrl.includes("unsplash.com") &&
+                                !img.imageUrl.includes("placeholder.com") &&
+                                !img.imageUrl.includes("placehold.co")
+                            ).map((img) => (
                                 <div
                                     key={img.id}
                                     className="relative aspect-square rounded-2xl overflow-hidden shadow-sm group"
@@ -352,54 +392,118 @@ export default function PlaceDetailPage() {
                                     />
                                 </div>
                             ))}
-                            {place.images.length === 0 && (
-                                <div className="col-span-2 text-center py-12 text-gray-400">
-                                    <div className="text-4xl mb-3">📸</div>
-                                    <p className="text-sm font-medium">No photos yet</p>
-                                </div>
-                            )}
+                            {place.images.filter((img) =>
+                                !img.imageUrl.includes("unsplash.com") &&
+                                !img.imageUrl.includes("placeholder.com") &&
+                                !img.imageUrl.includes("placehold.co")
+                            ).length === 1 && (
+                                    <div className="relative aspect-square rounded-2xl bg-gray-50 border border-dashed border-gray-200 flex flex-col items-center justify-center p-4 text-center">
+                                        <div className="text-2xl mb-2 opacity-50">📷</div>
+                                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-relaxed">More photos<br />coming soon</p>
+                                    </div>
+                                )}
+                            {place.images.filter((img) =>
+                                !img.imageUrl.includes("unsplash.com") &&
+                                !img.imageUrl.includes("placeholder.com") &&
+                                !img.imageUrl.includes("placehold.co")
+                            ).length === 0 && (
+                                    <div className="col-span-2 text-center py-12 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+                                        <div className="text-4xl mb-3">📸</div>
+                                        <p className="text-sm font-bold text-gray-900">No photos yet</p>
+                                        <p className="text-xs text-gray-400 mt-1">We're verifying real images for this place.</p>
+                                    </div>
+                                )}
                         </div>
                     )}
 
                     {activeTab === "reviews" && (
                         <div className="space-y-4">
+                            {/* Review Form */}
+                            {user ? (
+                                <form onSubmit={submitReview} className="bg-gray-50 rounded-2xl p-4 border border-gray-100">
+                                    <h3 className="text-sm font-bold text-gray-900 mb-3">Write a Review</h3>
+
+                                    <div className="flex gap-1 mb-3">
+                                        {[1, 2, 3, 4, 5].map((star) => (
+                                            <button
+                                                key={star}
+                                                type="button"
+                                                onClick={() => setRating(star)}
+                                                onMouseEnter={() => setHoverRating(star)}
+                                                onMouseLeave={() => setHoverRating(0)}
+                                                className="p-1 -ml-1 hover:scale-110 transition-transform"
+                                            >
+                                                <Star className={`w-6 h-6 ${(hoverRating || rating) >= star ? "text-ethiopia-yellow fill-ethiopia-yellow" : "text-gray-300"}`} />
+                                            </button>
+                                        ))}
+                                    </div>
+
+                                    <textarea
+                                        className="w-full bg-white border border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-ethiopia-green/20 mb-3 min-h-[80px]"
+                                        placeholder="How was your experience?"
+                                        value={reviewComment}
+                                        onChange={(e) => setReviewComment(e.target.value)}
+                                        required
+                                    />
+
+                                    <button
+                                        type="submit"
+                                        disabled={!rating || isSubmittingReview}
+                                        className="bg-brand-dark text-white text-xs font-black uppercase tracking-widest px-5 py-2.5 rounded-xl disabled:opacity-50"
+                                    >
+                                        {isSubmittingReview ? "Submitting..." : "Submit Review"}
+                                    </button>
+                                </form>
+                            ) : (
+                                <Link href="/auth" className="block bg-ethiopia-green/5 rounded-2xl p-5 text-center border border-ethiopia-green/10">
+                                    <h3 className="text-sm font-bold text-gray-900">Log in to leave a review</h3>
+                                    <p className="text-xs text-brand-muted mt-1">Join the community to share your experience.</p>
+                                </Link>
+                            )}
+
+                            {/* Reviews List */}
                             {place.reviews.length === 0 ? (
-                                <div className="text-center py-12 bg-white rounded-2xl border border-dashed border-gray-200">
+                                <div className="text-center py-12 bg-white rounded-2xl border border-dashed border-gray-200 mt-4">
                                     <div className="text-4xl mb-3">⭐</div>
                                     <h3 className="text-sm font-bold text-gray-900">No reviews yet</h3>
                                     <p className="text-gray-400 text-xs mt-1">Be the first to share your experience</p>
                                 </div>
                             ) : (
-                                place.reviews.map((review) => (
-                                    <div key={review.id} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
-                                        <div className="flex items-center justify-between mb-2">
-                                            <span className="text-sm font-bold text-gray-900">
-                                                {review.user.name}
-                                            </span>
-                                            <div className="flex items-center gap-1">
-                                                {Array.from({ length: 5 }).map((_, i) => (
-                                                    <Star
-                                                        key={i}
-                                                        className={`w-3 h-3 ${i < review.rating
-                                                            ? "text-ethiopia-yellow fill-ethiopia-yellow"
-                                                            : "text-gray-200"
-                                                            }`}
-                                                    />
-                                                ))}
+                                <div className="mt-4 space-y-3">
+                                    {place.reviews.map((review) => (
+                                        <div key={review.id} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+                                            <div className="flex items-center justify-between mb-2">
+                                                <span className="text-sm font-bold text-gray-900">
+                                                    {review.user.name}
+                                                </span>
+                                                <div className="flex items-center gap-1">
+                                                    {Array.from({ length: 5 }).map((_, i) => (
+                                                        <Star
+                                                            key={i}
+                                                            className={`w-3 h-3 ${i < review.rating
+                                                                ? "text-ethiopia-yellow fill-ethiopia-yellow"
+                                                                : "text-gray-200"
+                                                                }`}
+                                                        />
+                                                    ))}
+                                                </div>
+                                            </div>
+                                            {review.title && (
+                                                <h4 className="text-sm font-bold text-gray-800 mb-1">
+                                                    {review.title}
+                                                </h4>
+                                            )}
+                                            {review.body && (
+                                                <p className="text-[11px] text-gray-600 leading-relaxed font-medium">
+                                                    {review.body}
+                                                </p>
+                                            )}
+                                            <div className="text-[9px] text-gray-400 mt-2 uppercase tracking-wide">
+                                                {new Date(review.createdAt).toLocaleDateString()}
                                             </div>
                                         </div>
-                                        {review.title && (
-                                            <h4 className="text-sm font-bold text-gray-800 mb-1">
-                                                {review.title}
-                                            </h4>
-                                        )}
-                                        {review.body && (
-                                            <p className="text-xs text-gray-500 leading-relaxed">
-                                                {review.body}
-                                            </p>
-                                        )}
-                                    </div>
-                                ))
+                                    ))}
+                                </div>
                             )}
                         </div>
                     )}
