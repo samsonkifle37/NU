@@ -30,9 +30,15 @@ export async function GET(
             _avg: { rating: true },
         });
 
+        const audit = await prisma.imageAudit.findFirst({
+            where: { entityId: place.id },
+            select: { status: true }
+        });
+
         return NextResponse.json({
             ...place,
             avgRating: agg._avg.rating || null,
+            auditStatus: audit?.status || null,
         });
     } catch (error) {
         console.error("Error fetching place:", error);

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
+import { VerifiedImage } from "@/components/media/VerifiedImage";
 import { useQuery } from "@tanstack/react-query";
 import {
   Search,
@@ -26,6 +26,7 @@ interface PlaceData {
   shortDescription: string | null;
   avgRating: number | null;
   images: { imageUrl: string }[];
+  auditStatus?: "ok" | "missing" | "blocked" | "broken" | null;
 }
 
 async function fetchPlaces(types: string, limit: number) {
@@ -141,17 +142,14 @@ function PlaceSection({
               className="flex-shrink-0 w-52 bg-white rounded-2xl shadow-lg shadow-gray-200/30 overflow-hidden border border-gray-50 group active:scale-[0.97] transition-all"
             >
               <div className="relative h-32 overflow-hidden">
-                {place.images[0] ? (
-                  <Image
-                    src={place.images[0].imageUrl}
-                    alt={place.name}
-                    fill
-                    className="object-cover group-hover:scale-110 transition-transform duration-500"
-                    sizes="208px"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300" />
-                )}
+                <VerifiedImage
+                  src={place.images[0]?.imageUrl}
+                  alt={place.name}
+                  className="w-full h-full group-hover:scale-110 transition-transform duration-500"
+                  entityType={place.type as any}
+                  status={place.auditStatus}
+                  showBadge={false}
+                />
                 {place.avgRating && (
                   <div className="absolute top-2.5 right-2.5 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded-full flex items-center gap-1">
                     <Star className="w-3 h-3 text-ethiopia-yellow fill-ethiopia-yellow" />

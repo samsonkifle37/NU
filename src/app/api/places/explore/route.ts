@@ -23,7 +23,18 @@ export async function GET(request: NextRequest) {
             take: limit
         });
 
-        return NextResponse.json({ places }, { status: 200 });
+        const audits = await prisma.imageAudit.findMany({
+            where: { entityId: { in: places.map((p) => p.id) } },
+            select: { entityId: true, status: true }
+        });
+        const auditMap = new Map(audits.map((a: { entityId: string; status: string }) => [a.entityId, a.status]));
+
+        const placesWithStatus = places.map(place => ({
+            ...place,
+            auditStatus: auditMap.get(place.id) || null
+        }));
+
+        return NextResponse.json({ places: placesWithStatus }, { status: 200 });
     } catch (error) {
         console.error("Explore fetch error:", error);
         return NextResponse.json({ error: "Failed to fetch places" }, { status: 500 });

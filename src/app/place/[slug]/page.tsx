@@ -2,8 +2,8 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
+import { VerifiedImage } from "@/components/media/VerifiedImage";
 import {
     ArrowLeft,
     Star,
@@ -55,6 +55,7 @@ interface PlaceDetail {
     reviews: Review[];
     avgRating: number | null;
     _count: { reviews: number; favorites: number };
+    auditStatus?: "ok" | "missing" | "blocked" | "broken" | null;
 }
 
 async function fetchPlace(slug: string): Promise<PlaceDetail> {
@@ -152,18 +153,15 @@ export default function PlaceDetailPage() {
         <div className="space-y-0 -mx-4">
             {/* Hero image */}
             <div className="relative h-80 overflow-hidden">
-                {heroImage ? (
-                    <Image
-                        src={heroImage}
-                        alt={place.name}
-                        fill
-                        className="object-cover"
-                        sizes="100vw"
-                        priority
-                    />
-                ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400" />
-                )}
+                <VerifiedImage
+                    src={heroImage}
+                    alt={place.name}
+                    className="w-full h-full"
+                    entityType={place.type as any}
+                    status={place.auditStatus}
+                    showBadge={false}
+                    priority={true}
+                />
 
                 {/* Gradient overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
@@ -342,14 +340,15 @@ export default function PlaceDetailPage() {
                             {place.images.map((img) => (
                                 <div
                                     key={img.id}
-                                    className="relative aspect-square rounded-2xl overflow-hidden shadow-sm"
+                                    className="relative aspect-square rounded-2xl overflow-hidden shadow-sm group"
                                 >
-                                    <Image
+                                    <VerifiedImage
                                         src={img.imageUrl}
                                         alt={img.altText || place.name}
-                                        fill
-                                        className="object-cover hover:scale-110 transition-transform duration-500"
-                                        sizes="(max-width: 256px) 50vw, 256px"
+                                        className="w-full h-full group-hover:scale-110 transition-transform duration-500"
+                                        entityType={place.type as any}
+                                        status={place.auditStatus}
+                                        showBadge={false}
                                     />
                                 </div>
                             ))}

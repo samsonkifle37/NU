@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { Search, Filter, Map, Link as LinkIcon, Share2, Navigation } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
+import { VerifiedImage } from "@/components/media/VerifiedImage";
 import { BottomNav } from "@/components/BottomNav";
 
 interface Place {
@@ -15,6 +15,7 @@ interface Place {
     websiteUrl: string | null;
     featured: boolean;
     images: { imageUrl: string; errorType?: string }[];
+    auditStatus?: "ok" | "missing" | "blocked" | "broken" | null;
 }
 
 export function ExploreClient() {
@@ -90,8 +91,8 @@ export function ExploreClient() {
                             key={cat.id}
                             onClick={() => setActiveTab(cat.id)}
                             className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-colors border ${activeTab === cat.id
-                                    ? "bg-brand-dark text-white border-brand-dark shadow-md shadow-gray-200"
-                                    : "bg-white text-gray-500 border-gray-100 hover:bg-gray-50"
+                                ? "bg-brand-dark text-white border-brand-dark shadow-md shadow-gray-200"
+                                : "bg-white text-gray-500 border-gray-100 hover:bg-gray-50"
                                 }`}
                         >
                             {cat.label}
@@ -145,29 +146,22 @@ export function ExploreClient() {
 }
 
 function PlaceCard({ place, onClick }: { place: Place, onClick: () => void }) {
-    const imageUrl = place.images?.[0]?.imageUrl || "/no-image.jpg";
-    const [imgError, setImgError] = useState(false);
+    const imageUrl = place.images?.[0]?.imageUrl || "";
 
     return (
         <div
             onClick={onClick}
             className="group block bg-white rounded-[2rem] shadow-lg shadow-gray-200/40 overflow-hidden border border-gray-100 cursor-pointer active:scale-[0.98] transition-all"
         >
-            <div className="relative h-48 w-full bg-gray-100">
-                {!imgError ? (
-                    <img
-                        src={imageUrl}
-                        alt={place.name}
-                        loading="lazy"
-                        onError={() => setImgError(true)}
-                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                    />
-                ) : (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-100 text-gray-300">
-                        <Map className="w-8 h-8 mb-2 opacity-30" />
-                        <span className="text-[10px] uppercase tracking-widest font-black opacity-40">Image Pending</span>
-                    </div>
-                )}
+            <div className="relative h-48 w-full bg-gray-100 group/image">
+                <VerifiedImage
+                    src={imageUrl}
+                    alt={place.name}
+                    className="w-full h-full group-hover:scale-105 transition-transform duration-700"
+                    entityType={place.type as any}
+                    status={place.auditStatus}
+                    showBadge={true}
+                />
 
                 <div className="absolute top-4 left-4">
                     <span className="bg-white/90 backdrop-blur text-brand-dark px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-[0.15em] shadow-sm">
@@ -184,8 +178,7 @@ function PlaceCard({ place, onClick }: { place: Place, onClick: () => void }) {
 }
 
 function PlaceModal({ place, onClose }: { place: Place, onClose: () => void }) {
-    const imageUrl = place.images?.[0]?.imageUrl || "/no-image.jpg";
-    const [imgError, setImgError] = useState(false);
+    const imageUrl = place.images?.[0]?.imageUrl || "";
 
     return (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4">
@@ -198,20 +191,15 @@ function PlaceModal({ place, onClose }: { place: Place, onClose: () => void }) {
                     </button>
                 </div>
 
-                <div className="relative h-64 w-full bg-gray-100">
-                    {!imgError ? (
-                        <img
-                            src={imageUrl}
-                            alt={place.name}
-                            onError={() => setImgError(true)}
-                            className="absolute inset-0 w-full h-full object-cover"
-                        />
-                    ) : (
-                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-100 text-gray-300">
-                            <Map className="w-10 h-10 mb-2 opacity-30" />
-                            <span className="text-[10px] uppercase tracking-widest font-black opacity-40">Image Pending</span>
-                        </div>
-                    )}
+                <div className="relative h-64 w-full bg-gray-100 group/image">
+                    <VerifiedImage
+                        src={imageUrl}
+                        alt={place.name}
+                        className="w-full h-full"
+                        entityType={place.type as any}
+                        status={place.auditStatus}
+                        showBadge={true}
+                    />
                 </div>
 
                 <div className="p-6 md:p-8">

@@ -49,8 +49,15 @@ export async function GET(request: NextRequest) {
             prisma.place.count({ where }),
         ]);
 
-        // Compute avg rating per place
-        const placesWithRating = await Promise.all(
+        // Fetch image audits for these places to provide explicit status
+        const audits = await prisma.imageAudit.findMany({
+            where: { entityId: { in: places.map((p) => p.id) } },
+            select: { entityId: true, status: true }
+        });
+        const auditMap = new Map(audits.map((a: { entityId: string; status: string }) => [a.entityId, a.status]));
+
+        // Compute avg rating per place & attach audit status
+        const placesWithExtras = await Promise.all(
             places.map(async (place) => {
                 const agg = await prisma.review.aggregate({
                     where: { placeId: place.id },
@@ -59,12 +66,13 @@ export async function GET(request: NextRequest) {
                 return {
                     ...place,
                     avgRating: agg._avg.rating || null,
+                    auditStatus: auditMap.get(place.id) || null
                 };
             })
         );
 
         return NextResponse.json({
-            places: placesWithRating,
+            places: placesWithExtras,
             total,
             limit,
             offset,
