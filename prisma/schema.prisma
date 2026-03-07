@@ -54,14 +54,16 @@ model Place {
 }
 
 model PlaceImage {
-  id            String   @id @default(uuid())
+  id            String    @id @default(uuid())
   placeId       String
-  place         Place    @relation(fields: [placeId], references: [id], onDelete: Cascade)
+  place         Place     @relation(fields: [placeId], references: [id], onDelete: Cascade)
   imageUrl      String
-  sourcePageUrl String?
+  imageSource   String?   // official, wikimedia, tripadvisor, maps, unsplash
+  sourcePageUrl String?   // the page where the image was found
   altText       String?
-  priority      Int      @default(0)  // 0 = hero, higher = gallery
-  createdAt     DateTime @default(now())
+  priority      Int       @default(0)  // 0 = hero, higher = gallery
+  createdAt     DateTime  @default(now())
+  verifiedAt    DateTime?
 }
 
 model PlaceImageError {

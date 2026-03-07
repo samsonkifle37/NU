@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { PlaceCard } from "./PlaceCard";
 import { Search, Filter } from "lucide-react";
-import { getPrimaryImage } from "@/lib/images";
+import { getPrimaryVerifiedImage } from "@/lib/images";
 
 interface PlaceGridProps {
     title: string;
@@ -148,7 +148,7 @@ export function PlaceGrid({
                             city={place.city}
                             area={place.area}
                             shortDescription={place.shortDescription}
-                            heroImage={getPrimaryImage(place)}
+                            heroImage={getPrimaryVerifiedImage(place)}
                             avgRating={place.avgRating}
                             tags={place.tags}
                             websiteUrl={place.websiteUrl}

@@ -14,7 +14,7 @@ export interface ImageEntity {
  * Enforces the rule that we only show verified/good images (auditStatus 'ok').
  * If missing, blocked, or no images exist, returns null (letting VerifiedImage component handle the fallback).
  */
-export function getPrimaryImage(entity: any, entityType?: string, entityId?: string): string | null {
+export function getPrimaryVerifiedImage(entity: any, entityType?: string, entityId?: string): string | null {
     if (!entity) return null;
 
     let possibleImageUrl = null;

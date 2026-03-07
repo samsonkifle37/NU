@@ -19,7 +19,7 @@ import {
 import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { useInAppBrowser } from "@/components/InAppBrowser";
-import { getPrimaryImage } from "@/lib/images";
+import { getPrimaryVerifiedImage } from "@/lib/images";
 
 interface PlaceImage {
     id: string;
@@ -177,7 +177,16 @@ export default function PlaceDetailPage() {
         resort: "bg-teal-500",
     };
 
-    const heroImage = getPrimaryImage(place);
+    const heroImage = getPrimaryVerifiedImage(place);
+
+    const galleryImages = (place.images || []).filter(img =>
+        !img.imageUrl.includes('unsplash.com') &&
+        !img.imageUrl.includes('placeholder.com') &&
+        !img.imageUrl.includes('placehold.co')
+    );
+    if (heroImage && !galleryImages.some(img => img.imageUrl === heroImage)) {
+        galleryImages.unshift({ id: 'fallback-hero', imageUrl: heroImage, altText: place.name, priority: 0 } as any);
+    }
 
     // Curated factual fallback for places with only short descriptions
     let displayDescription = place.longDescription;
@@ -391,11 +400,7 @@ export default function PlaceDetailPage() {
 
                     {activeTab === "gallery" && (
                         <div className="grid grid-cols-2 gap-3">
-                            {place.images.filter((img) =>
-                                !img.imageUrl.includes("unsplash.com") &&
-                                !img.imageUrl.includes("placeholder.com") &&
-                                !img.imageUrl.includes("placehold.co")
-                            ).map((img) => (
+                            {galleryImages.map((img) => (
                                 <div
                                     key={img.id}
                                     className="relative aspect-square rounded-2xl overflow-hidden shadow-sm group"
@@ -410,27 +415,19 @@ export default function PlaceDetailPage() {
                                     />
                                 </div>
                             ))}
-                            {place.images.filter((img) =>
-                                !img.imageUrl.includes("unsplash.com") &&
-                                !img.imageUrl.includes("placeholder.com") &&
-                                !img.imageUrl.includes("placehold.co")
-                            ).length === 1 && (
-                                    <div className="relative aspect-square rounded-2xl bg-gray-50 border border-dashed border-gray-200 flex flex-col items-center justify-center p-4 text-center">
-                                        <div className="text-2xl mb-2 opacity-50">📷</div>
-                                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-relaxed">More photos<br />coming soon</p>
-                                    </div>
-                                )}
-                            {place.images.filter((img) =>
-                                !img.imageUrl.includes("unsplash.com") &&
-                                !img.imageUrl.includes("placeholder.com") &&
-                                !img.imageUrl.includes("placehold.co")
-                            ).length === 0 && (
-                                    <div className="col-span-2 text-center py-12 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
-                                        <div className="text-4xl mb-3">📸</div>
-                                        <p className="text-sm font-bold text-gray-900">No photos yet</p>
-                                        <p className="text-xs text-gray-400 mt-1">We're verifying real images for this place.</p>
-                                    </div>
-                                )}
+                            {galleryImages.length === 1 && (
+                                <div className="relative aspect-square rounded-2xl bg-gray-50 border border-dashed border-gray-200 flex flex-col items-center justify-center p-4 text-center">
+                                    <div className="text-2xl mb-2 opacity-50">📷</div>
+                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-relaxed">More photos<br />coming soon</p>
+                                </div>
+                            )}
+                            {galleryImages.length === 0 && (
+                                <div className="col-span-2 text-center py-12 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+                                    <div className="text-4xl mb-3">📸</div>
+                                    <p className="text-sm font-bold text-gray-900">No photos yet</p>
+                                    <p className="text-[10px] text-gray-400 mt-2 uppercase tracking-widest leading-relaxed">We're verifying real images for this place.</p>
+                                </div>
+                            )}
                         </div>
                     )}
 

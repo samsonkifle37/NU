@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { VerifiedImage } from "@/components/media/VerifiedImage";
-import { getPrimaryImage } from "@/lib/images";
+import { getPrimaryVerifiedImage } from "@/lib/images";
 import { useQuery } from "@tanstack/react-query";
 import {
   Search,
@@ -144,7 +144,7 @@ function PlaceSection({
             >
               <div className="relative h-32 overflow-hidden">
                 <VerifiedImage
-                  src={getPrimaryImage(place)}
+                  src={getPrimaryVerifiedImage(place)}
                   alt={place.name}
                   className="w-full h-full group-hover:scale-110 transition-transform duration-500"
                   entityType={place.type as any}
