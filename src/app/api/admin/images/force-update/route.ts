@@ -55,7 +55,7 @@ export async function GET() {
             }
         }
         return NextResponse.json({ success: true, results });
-    } catch (e) {
+    } catch (e: any) {
         return NextResponse.json({ error: e.message }, { status: 500 });
     }
 }
