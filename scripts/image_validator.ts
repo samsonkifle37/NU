@@ -16,9 +16,15 @@ async function validateImage(url: string) {
     if (!url) return { status: 'missing', code: 0 };
 
     try {
-        const response = await axios.head(url, {
-            timeout: 5000,
-            headers: { 'User-Agent': 'AddisViewBot/1.0' }
+        const response = await axios.get(url, {
+            timeout: 8000,
+            maxRedirects: 5,
+            headers: {
+                'User-Agent': 'AddisViewImageValidator/1.0 (contact: admin@addisview.app)',
+                'Accept': 'image/avif,image/webp,image/apng,image/*,*/*;q=0.8',
+                'Referer': 'https://addisview.vercel.app'
+            },
+            responseType: 'stream'
         });
 
         const contentType = response.headers['content-type'];
@@ -29,7 +35,8 @@ async function validateImage(url: string) {
         return { status: 'ok', code: response.status };
     } catch (error: any) {
         if (error.response) {
-            return { status: 'broken', code: error.response.status, notes: error.message };
+            const status = error.response.status === 403 ? 'blocked' : 'broken';
+            return { status, code: error.response.status, notes: error.message };
         }
         return { status: 'broken', code: 500, notes: error.message };
     }
