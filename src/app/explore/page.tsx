@@ -1,5 +1,5 @@
 export const metadata = {
-    title: "Explore Addis — AddisView V2.5",
+    title: "Explore Addis — NU V2.5",
     description: "Curated list of real places, parks, markets, and experiences.",
 };
 

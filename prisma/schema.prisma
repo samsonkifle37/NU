@@ -18,6 +18,8 @@ model User {
   updatedAt     DateTime   @updatedAt
   favorites     Favorite[]
   reviews       Review[]
+  ownerClaims   OwnerClaim[]
+  visits        PlaceVisit[]
 }
 
 model Place {
@@ -44,6 +46,30 @@ model Place {
   neighborhood     String?
   featured         Boolean      @default(false)
   isActive         Boolean      @default(true)
+  
+  // Pipeline Enrichment Fields
+  verificationLevel Int         @default(30)
+  verificationScore Int         @default(30)
+  visualScore       Int         @default(0)
+  claimable         Boolean     @default(true)
+  brandName         String?
+  subcategory       String?
+  district          String?
+  fullAddress       String?
+  whatsapp          String?
+  openingHours      Json?
+  currency          String      @default("ETB")
+  reviewCount       Int         @default(0)
+  sourceCount       Int         @default(0)
+  bookingLink       String?
+  socialLinks       Json?
+  highlights        String[]    @default([])
+  amenities         String[]    @default([])
+  ownerVerified     Boolean     @default(false)
+  ownerId           String?
+  claimedAt         DateTime?
+  lastCheckedAt     DateTime?
+  
   createdAt        DateTime     @default(now())
   updatedAt        DateTime     @updatedAt
   images           PlaceImage[]
@@ -51,7 +77,46 @@ model Place {
   reviews          Review[]
   hostListings     HostListing[]
   imageErrors      PlaceImageError[]
+  ownerClaims      OwnerClaim[]
+  ingestionListing IngestionListing?
+  visits           PlaceVisit[]
+  
+  placeSources     PlaceSource[]
+  verificationLogs VerificationLog[]
 }
+
+model PlaceSource {
+  id              String   @id @default(uuid())
+  placeId         String
+  url             String
+  sourceName      String   // booking, google, tripadvisor, official, wikimedia
+  sourceType      String   // Tier A, Tier B, Tier C
+  rawJson         Json?
+  scrapedAt       DateTime @default(now())
+  place           Place    @relation(fields: [placeId], references: [id], onDelete: Cascade)
+
+  @@unique([placeId, url])
+}
+
+model VerificationLog {
+  id              String   @id @default(uuid())
+  placeId         String
+  scoreChange     Int
+  reason          String
+  newScore        Int
+  createdAt       DateTime @default(now())
+  place           Place    @relation(fields: [placeId], references: [id], onDelete: Cascade)
+}
+
+model DuplicateCandidate {
+  id              String   @id @default(uuid())
+  masterPlaceId   String
+  duplicateId     String
+  similarityScore Int
+  status          String   @default("PENDING") // MERGED, REJECTED
+  createdAt       DateTime @default(now())
+}
+
 
 model PlaceImage {
   id            String    @id @default(uuid())
@@ -64,6 +129,19 @@ model PlaceImage {
   priority      Int       @default(0)  // 0 = hero, higher = gallery
   createdAt     DateTime  @default(now())
   verifiedAt    DateTime?
+
+  // Pipeline Quality Fields
+  status          String    @default("PENDING") // PENDING, APPROVED, REJECTED, FAILED
+  qualityScore    Int       @default(0)
+  isMirrored      Boolean   @default(false)
+  mirroredUrl     String?
+  width           Int?
+  height          Int?
+  hash            String?   
+  labels          String[]  @default([])
+  rejectionReason String?
+
+  imageTruthType  String    @default("place_real") // place_real, representative, placeholder
 }
 
 model PlaceImageError {
@@ -170,4 +248,83 @@ model HostListingImage {
   imageUrl       String
   altText        String?
   createdAt      DateTime    @default(now())
+}
+
+// ── Ingestion Foundry (Listing Factory) ────────────
+enum IngestionStatus {
+  DRAFT
+  REVIEW
+  PUBLISHED
+  REJECTED
+}
+
+model IngestionListing {
+  id                String          @id @default(uuid())
+  name              String
+  slug              String          @unique
+  category          String
+  subcategory       String?
+  city              String
+  district          String?
+  country           String          @default("Ethiopia")
+  lat               Float?
+  lng               Float?
+  address           String?
+  website           String?
+  phone             String?
+  sourceSummary     Json?
+  shortDescription  String?
+  longDescription   String?
+  tags              String[]        @default([])
+  seoTitle          String?
+  seoDescription    String?
+  imageUrls         String[]        @default([])
+  confidenceScore   Float           @default(0.0)
+  status            IngestionStatus @default(DRAFT)
+  
+  sourceProvenance  Json?
+  
+  placeId           String?         @unique
+  place             Place?          @relation(fields: [placeId], references: [id])
+  
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  lastRefreshAt     DateTime?
+}
+
+// ── Owner Claim + Photo Upload ────────────
+model OwnerClaim {
+  id              String   @id @default(uuid())
+  placeId         String
+  userId          String?
+  fullName        String
+  email           String
+  phone           String
+  relationship    String   @default("owner")
+  proofNote       String?
+  status          String   @default("PENDING") // PENDING, APPROVED, REJECTED, NEEDS_REVIEW
+  submittedAt     DateTime @default(now())
+  resolvedAt      DateTime?
+  
+  place           Place    @relation(fields: [placeId], references: [id], onDelete: Cascade)
+  user            User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([placeId])
+  @@index([status])
+}
+
+// ✈️ Check-In Journal ━━━━━━━━━━━━━━━━━━━━━━━━━━
+model PlaceVisit {
+  id          String    @id @default(uuid())
+  userId      String
+  placeId     String
+  visitedAt   DateTime  @default(now())
+  note        String?   // optional journal note
+  rating      Int?      // optional 1-5 quick rating
+
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  place       Place     @relation(fields: [placeId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([placeId])
 }

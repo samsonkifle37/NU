@@ -156,7 +156,7 @@ export default function BecomeAHostPage() {
                             Have a home in Ethiopia?
                         </h1>
                         <p className="text-white/80 text-sm leading-relaxed font-medium">
-                            Share it with travelers from around the world and earn income with AddisView.
+                            Share it with travelers from around the world and earn income with NU.
                         </p>
                     </div>
                 </div>
@@ -179,7 +179,7 @@ export default function BecomeAHostPage() {
                         },
                         {
                             num: "3",
-                            title: "Go live on AddisView",
+                            title: "Go live on NU",
                             desc: "Once approved, your listing appears on the Stays page with a 'Hosted Home' badge.",
                         },
                     ].map((item) => (
@@ -206,7 +206,7 @@ export default function BecomeAHostPage() {
                 <div className="bg-gray-900 rounded-[2.5rem] p-8 text-white space-y-5">
                     <h2 className="text-lg font-black tracking-tight uppercase flex items-center gap-2">
                         <Sparkles className="w-5 h-5 text-ethiopia-yellow" />
-                        Why host with AddisView?
+                        Why host with NU?
                     </h2>
                     {[
                         "Reach international travelers visiting Ethiopia",
@@ -246,7 +246,7 @@ export default function BecomeAHostPage() {
                 </h1>
                 <p className="text-sm text-gray-500 max-w-xs leading-relaxed font-medium">
                     Thank you! Your listing has been submitted and is waiting for
-                    approval. We&apos;ll email you once it&apos;s live on AddisView.
+                    approval. We&apos;ll email you once it&apos;s live on NU.
                 </p>
                 <div className="bg-amber-50 p-5 rounded-2xl border border-amber-100 max-w-xs">
                     <p className="text-xs text-amber-700 font-bold leading-relaxed">
@@ -549,7 +549,7 @@ export default function BecomeAHostPage() {
 
             <p className="text-[10px] text-gray-400 text-center font-medium leading-relaxed">
                 By submitting, you agree that your listing information will be
-                reviewed by the AddisView team. Approved listings will be
+                reviewed by the NU team. Approved listings will be
                 publicly visible on the Stays page.
             </p>
         </div>

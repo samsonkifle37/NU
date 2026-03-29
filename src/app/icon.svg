@@ -1,0 +1,7 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@900&amp;display=swap');
+  </style>
+  <rect width="512" height="512" rx="112" fill="#0B0F19"/>
+  <text x="256" y="380" font-family="'Noto Sans Ethiopic', sans-serif" font-size="340" font-weight="900" fill="#D4A437" text-anchor="middle">ኑ</text>
+</svg>

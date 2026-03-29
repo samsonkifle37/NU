@@ -1,0 +1,28 @@
+<svg width="1000" height="600" viewBox="0 0 1000 600" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient id="grad-b26d6291-1c4b-46a8-b69d-efb1ff9161da" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#333333;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#111111;stop-opacity:1" />
+        </linearGradient>
+        <pattern id="pattern-b26d6291-1c4b-46a8-b69d-efb1ff9161da" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+            <circle cx="20" cy="20" r="1.5" fill="#ffffff" fill-opacity="0.1"/>
+        </pattern>
+    </defs>
+    <rect width="1000" height="600" fill="url(#grad-b26d6291-1c4b-46a8-b69d-efb1ff9161da)" />
+    <rect width="1000" height="600" fill="url(#pattern-b26d6291-1c4b-46a8-b69d-efb1ff9161da)" />
+    
+    <!-- Branding -->
+    <text x="500" y="270" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="28" font-weight="900" fill="#ffffff" opacity="0.9" text-anchor="middle" letter-spacing="4">
+        ADDISVIEW
+    </text>
+    
+    <!-- Category -->
+    <text x="500" y="320" font-family="monospace" font-size="16" font-weight="bold" fill="#E8C07A" opacity="0.8" text-anchor="middle" letter-spacing="2">
+        CATEGORY: RESORT
+    </text>
+    
+    <!-- Property Binding (Ensures Hash Uniqueness) -->
+    <text x="500" y="550" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto" font-size="12" font-weight="500" fill="#ffffff" opacity="0.4" text-anchor="middle">
+        ID: 9537db31-032e-41dc-b871-19d0dc168a85 | Kuriftu Resort Bishoftu
+    </text>
+</svg>

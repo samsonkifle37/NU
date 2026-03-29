@@ -9,8 +9,8 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    // Use DIRECT_URL for migrations/push (bypasses PgBouncer)
-    // Runtime Prisma Client will use DATABASE_URL (with PgBouncer)
-    url: process.env["DIRECT_URL"] || process.env["DATABASE_URL"],
+    // Temp using DIRECT_URL for db push
+    url: process.env["DIRECT_URL"],
   },
 });
+

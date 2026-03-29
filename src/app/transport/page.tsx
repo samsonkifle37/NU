@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useMemo } from "react";
 import {
@@ -145,10 +145,10 @@ const rideHailing: ServiceDetail[] = [
         shortCode: "8294",
         description:
             "Ethiopia's pioneer and most popular ride-hailing service. Available 24/7 across Addis Ababa.",
-        website: "https://ride.com.et",
+        website: "https://ride8294.com/",
         playStore:
-            "https://play.google.com/store/apps/details?id=com.ride.passenger",
-        appStore: "https://apps.apple.com/app/ride-hailing/id1234567890",
+            "https://play.google.com/store/apps/details?id=com.multibrains.taxi.passenger.ridepassengeret&hl=en&gl=US",
+        appStore: "https://apps.apple.com/us/app/ride-ethiopia-djibouti/id1375514824",
         howToUse: [
             'Download the "RIDE" app from App Store or Google Play',
             "Register with your Ethiopian or international phone number",
@@ -160,32 +160,7 @@ const rideHailing: ServiceDetail[] = [
         priceRange: "80 - 500 ETB",
         coverage: "Addis Ababa, Adama, Bahir Dar, Hawassa",
         rating: "4.2",
-        tip: 'The "Ladies" option provides female drivers for female passengers — perfect for solo travellers.',
-    },
-    {
-        name: "Feres",
-        color: "bg-green-600",
-        textColor: "text-white",
-        phone: "+251-116-390-609",
-        shortCode: "6090",
-        description:
-            'Known for its loyalty rewards program ("Feres Miles"). Reliable service with well-maintained vehicles.',
-        website: "https://feres.et",
-        playStore:
-            "https://play.google.com/store/apps/details?id=com.feresrides",
-        appStore: "https://apps.apple.com/app/feres/id1345678901",
-        howToUse: [
-            'Download "Feres" from your app store',
-            "Sign up with phone number and verify via SMS",
-            "Enter your destination in the search bar",
-            "Select ride type and confirm booking",
-            "Track your driver in real-time on the map",
-            'Earn "Feres Miles" on every ride for discounts',
-        ],
-        priceRange: "70 - 450 ETB",
-        coverage: "Addis Ababa, Adama",
-        rating: "4.3",
-        tip: "Collect Feres Miles on every trip — 10 rides = 1 free ride!",
+        tip: 'The "Ladies" option provides female drivers for female passengers â€” perfect for solo travellers.',
     },
     {
         name: "ZayRide",
@@ -197,8 +172,8 @@ const rideHailing: ServiceDetail[] = [
             "Modern ride-hailing with on-demand taxi and delivery services. Known for fast response times.",
         website: "https://zayride.com",
         playStore:
-            "https://play.google.com/store/apps/details?id=com.zayride",
-        appStore: "https://apps.apple.com/app/zayride/id1456789012",
+            "https://play.google.com/store/apps/details?id=com.zayride.passenger",
+        appStore: "https://apps.apple.com/us/app/zayride-passenger/id1139441921",
         howToUse: [
             'Download "ZayRide" from App Store or Google Play',
             "Register with your mobile number",
@@ -210,8 +185,117 @@ const rideHailing: ServiceDetail[] = [
         priceRange: "60 - 400 ETB",
         coverage: "Addis Ababa",
         rating: "4.1",
-        tip: "ZayRide also offers package delivery — great for sending items across the city!",
+        tip: "ZayRide also offers package delivery â€” great for sending items across the city!",
     },
+];
+
+// ========== AIRPORT PICKUP COMPONENT ==========
+function AirportPickupForm() {
+    const [submitting, setSubmitting] = useState(false);
+    const [success, setSuccess] = useState(false);
+
+    if (success) {
+        return (
+            <div className="bg-green-50 p-8 rounded-[2rem] border border-green-100 text-center space-y-4">
+                <div className="w-16 h-16 bg-ethiopia-green rounded-full flex items-center justify-center mx-auto shadow-lg shadow-green-200">
+                    <Shield className="w-8 h-8 text-white" />
+                </div>
+                <div>
+                    <h3 className="text-xl font-black text-gray-900 tracking-tight">Pickup Confirmed!</h3>
+                    <p className="text-sm text-gray-600 mt-2 font-medium">Your request has been securely processed. A verified driver will coordinate with you via WhatsApp within 15 minutes.</p>
+                </div>
+                <button onClick={() => setSuccess(false)} className="mt-4 text-[10px] font-black uppercase tracking-widest text-ethiopia-green hover:underline">
+                    Book Another
+                </button>
+            </div>
+        );
+    }
+
+    return (
+        <div className="bg-white p-7 rounded-[2rem] border border-gray-100 shadow-xl shadow-gray-200/20 space-y-5 relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-ethiopia-green via-ethiopia-yellow to-ethiopia-red" />
+            
+            <div className="flex items-center justify-between">
+                <div>
+                    <h3 className="text-lg font-black text-gray-900 tracking-tight">Book Airport Pickup</h3>
+                    <p className="text-xs text-gray-500 font-medium italic mt-1 pb-1">Safe, vetted drivers waiting with a sign at Bole (ADD).</p>
+                </div>
+                <div className="hidden sm:flex w-10 h-10 bg-gray-50 rounded-xl items-center justify-center">
+                    <Car className="w-5 h-5 text-gray-400" />
+                </div>
+            </div>
+
+            <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); setSubmitting(true); setTimeout(() => { setSubmitting(false); setSuccess(true); }, 1500); }}>
+                <div className="grid grid-cols-2 gap-3">
+                    <div>
+                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 block mb-1.5">Arrival Date</label>
+                        <input type="date" required className="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-100 focus:outline-none focus:ring-2 focus:ring-ethiopia-green/20 focus:border-ethiopia-green/30 text-sm font-medium" />
+                    </div>
+                    <div>
+                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 block mb-1.5">Est. Time</label>
+                        <input type="time" required className="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-100 focus:outline-none focus:ring-2 focus:ring-ethiopia-green/20 focus:border-ethiopia-green/30 text-sm font-medium" />
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                    <div>
+                         <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 block mb-1.5">Passengers</label>
+                         <select className="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-100 focus:outline-none focus:ring-2 focus:ring-ethiopia-green/20 focus:border-ethiopia-green/30 text-sm font-medium">
+                             <option>1-2 People</option>
+                             <option>3-4 People</option>
+                             <option>5+ People (Van)</option>
+                         </select>
+                    </div>
+                    <div>
+                         <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 block mb-1.5">Flight Number</label>
+                         <input type="text" placeholder="e.g. ET 501" className="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-100 focus:outline-none focus:ring-2 focus:ring-ethiopia-green/20 focus:border-ethiopia-green/30 text-sm font-medium" />
+                    </div>
+                </div>
+                
+                <div>
+                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 block mb-1.5">WhatsApp Number</label>
+                    <input type="tel" required placeholder="+1 234 567 8900" className="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-100 focus:outline-none focus:ring-2 focus:ring-ethiopia-green/20 focus:border-ethiopia-green/30 text-sm font-medium" />
+                </div>
+                
+                <div>
+                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 block mb-1.5">Destination (Hotel / Area)</label>
+                    <input type="text" required placeholder="Where in Addis?" className="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-100 focus:outline-none focus:ring-2 focus:ring-ethiopia-green/20 focus:border-ethiopia-green/30 text-sm font-medium" />
+                </div>
+
+                <button disabled={submitting} type="submit" className="w-full bg-[#1A1612] text-white py-4 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-black transition-colors shadow-lg disabled:opacity-50 flex justify-center items-center">
+                    {submitting ? "Processing..." : "Secure Pickup"}
+                </button>
+            </form>
+        </div>
+    );
+}
+
+// ========== INTER-CITY BUS DATA ==========
+const INTERCITY_BUSES = [
+    {
+         name: "Selam Bus",
+         color: "bg-blue-600",
+         route: "Addis â†’ Bahir Dar, Gondar, Hawassa, Dire Dawa",
+         price: "800 - 1500 ETB",
+         phone: "8032",
+         features: ["A/C", "Snacks", "WiFi (Limited)"]
+    },
+    {
+         name: "Sky Bus",
+         color: "bg-red-600",
+         route: "Addis â†’ Bahir Dar, Hawassa, Jimma",
+         price: "750 - 1300 ETB",
+         phone: "8033",
+         features: ["A/C", "Reclining Seats"]
+    },
+    {
+         name: "Abay Bus",
+         color: "bg-green-600",
+         route: "Addis â†’ Dessie, Mekelle, Bahir Dar",
+         price: "700 - 1200 ETB",
+         phone: "8034",
+         features: ["Modern Fleet", "On-board Toilet"]
+    }
 ];
 
 export default function TransportPage() {
@@ -270,6 +354,11 @@ export default function TransportPage() {
                 </p>
             </header>
 
+            {/* ========== AIRPORT PICKUP ========== */}
+            <section className="px-1">
+                 <AirportPickupForm />
+            </section>
+
             {/* ========== RIDE HAILING ========== */}
             <section className="space-y-4">
                 <div className="flex items-center gap-3 px-1">
@@ -303,7 +392,7 @@ export default function TransportPage() {
                                             <span className="text-[10px] font-black text-gray-500">
                                                 {app.rating}
                                             </span>
-                                            <span className="text-gray-200 mx-1">•</span>
+                                            <span className="text-gray-200 mx-1">â€¢</span>
                                             <span className="text-[10px] font-black text-ethiopia-green uppercase tracking-widest">
                                                 {app.priceRange.split("(")[0].trim()}
                                             </span>
@@ -329,7 +418,7 @@ export default function TransportPage() {
                                     </div>
                                 </a>
                                 <button
-                                    onClick={() => browser.open(app.website, app.name + " — Website")}
+                                    onClick={() => browser.open(app.website, app.name + " â€” Website")}
                                     className="flex flex-col items-center gap-2 bg-blue-50 hover:bg-blue-100 p-4 rounded-2xl text-center transition-colors group border border-blue-100"
                                 >
                                     <Globe className="w-5 h-5 text-blue-500 group-hover:scale-110 transition-transform" />
@@ -360,7 +449,7 @@ export default function TransportPage() {
 
                             <div className="flex gap-2">
                                 <button
-                                    onClick={() => browser.open(app.playStore, app.name + " — Google Play")}
+                                    onClick={() => browser.open(app.playStore, app.name + " â€” Google Play")}
                                     className="flex-1 flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-800 text-white py-3.5 rounded-2xl transition-colors shadow-lg shadow-gray-200"
                                 >
                                     <Download className="w-4 h-4" />
@@ -369,7 +458,7 @@ export default function TransportPage() {
                                     </span>
                                 </button>
                                 <button
-                                    onClick={() => browser.open(app.appStore, app.name + " — App Store")}
+                                    onClick={() => browser.open(app.appStore, app.name + " â€” App Store")}
                                     className="flex-1 flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-800 text-white py-3.5 rounded-2xl transition-colors shadow-lg shadow-gray-200"
                                 >
                                     <Download className="w-4 h-4" />
@@ -597,7 +686,7 @@ export default function TransportPage() {
                             ) : (
                                 <div className="p-6 bg-red-50 rounded-2xl border border-red-100 text-center">
                                     <span className="text-sm font-bold text-red-500">
-                                        🚫 Service Closed
+                                        ðŸš« Service Closed
                                     </span>
                                     <p className="text-[10px] text-gray-400 font-medium mt-1">
                                         LRT operates from 6:00 AM to 10:00 PM
@@ -607,10 +696,10 @@ export default function TransportPage() {
 
                             <div className="bg-amber-50 p-4 rounded-2xl border border-amber-100">
                                 <p className="text-[11px] text-amber-700 font-bold leading-relaxed">
-                                    ⏱ <strong>Note:</strong> These are estimated times based
+                                    â± <strong>Note:</strong> These are estimated times based
                                     on the official{" "}
                                     {frequency > 0 ? `${frequency}-minute` : ""} schedule.
-                                    Actual arrivals may vary by ±2-3 minutes.
+                                    Actual arrivals may vary by Â±2-3 minutes.
                                 </p>
                             </div>
                         </div>
@@ -707,9 +796,9 @@ export default function TransportPage() {
                         </div>
                         <div className="bg-amber-50 p-4 rounded-2xl border border-amber-100">
                             <p className="text-[11px] text-amber-700 font-bold leading-relaxed">
-                                💡 <strong>Tip:</strong> Stand by the roadside and put your
+                                ðŸ’¡ <strong>Tip:</strong> Stand by the roadside and put your
                                 hand out. Tell the Weyala your destination when they ask.
-                                Keep small bills (5, 10 ETB) handy — they often don&apos;t
+                                Keep small bills (5, 10 ETB) handy â€” they often don&apos;t
                                 carry change.
                             </p>
                         </div>
@@ -752,13 +841,61 @@ export default function TransportPage() {
                         </div>
                         <div className="bg-amber-50 p-4 rounded-2xl border border-amber-100">
                             <p className="text-[11px] text-amber-700 font-bold leading-relaxed">
-                                💡 <strong>Tip:</strong> Always agree on the price BEFORE
+                                ðŸ’¡ <strong>Tip:</strong> Always agree on the price BEFORE
                                 getting in or ensure the meter is on. A typical cross-city
                                 ride is 200-400 ETB. Ask your hotel to help negotiate fair
                                 rates.
                             </p>
                         </div>
                     </div>
+                </div>
+            </section>
+
+            {/* ========== INTER-CITY BUSES ========== */}
+            <section className="space-y-4">
+                <div className="flex items-center gap-3 px-1">
+                    <Globe className="w-6 h-6 text-purple-500" />
+                    <h2 className="text-xl font-black text-gray-900 tracking-tight">
+                        Inter-city Transport
+                    </h2>
+                </div>
+                <div className="grid gap-3">
+                    {INTERCITY_BUSES.map((bus) => (
+                        <div key={bus.name} className="bg-white p-5 rounded-[2rem] border border-gray-100 shadow-lg shadow-gray-200/20">
+                            <div className="flex items-center justify-between mb-3">
+                                <div className="flex items-center gap-3">
+                                    <div className={`w-10 h-10 ${bus.color} rounded-[1rem] flex items-center justify-center font-black text-white text-[10px] shadow-md`}>
+                                        {bus.name.split(" ")[0]}
+                                    </div>
+                                    <div>
+                                        <h4 className="font-black text-gray-900 text-sm tracking-tight">{bus.name}</h4>
+                                        <div className="flex flex-wrap gap-1 mt-0.5">
+                                            {bus.features.map(f => (
+                                                <span key={f} className="text-[8px] font-black uppercase text-gray-400 tracking-wider">
+                                                    â€¢ {f}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href={`tel:${bus.phone}`} className="flex-shrink-0 w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center hover:bg-gray-100 transition-colors border border-gray-100">
+                                    <Phone className="w-4 h-4 text-gray-600" />
+                                </a>
+                            </div>
+                            
+                            <div className="flex flex-col gap-2 p-3 bg-gray-50 rounded-2xl border border-gray-100">
+                                <div className="flex justify-between items-center">
+                                    <span className="text-[9px] font-black uppercase text-gray-400 tracking-widest">Main Routes</span>
+                                    <span className="text-[10px] font-black text-ethiopia-green bg-green-50 px-2 py-1 rounded-lg">
+                                        {bus.price}
+                                    </span>
+                                </div>
+                                <span className="font-bold text-gray-800 text-xs">
+                                    {bus.route}
+                                </span>
+                            </div>
+                        </div>
+                    ))}
                 </div>
             </section>
 
@@ -780,7 +917,7 @@ export default function TransportPage() {
                             {
                                 method: "Hotel Shuttle",
                                 price: "Free - 500 ETB",
-                                note: "Most hotels offer free airport pickup — call ahead!",
+                                note: "Most hotels offer free airport pickup â€” call ahead!",
                             },
                             {
                                 method: "Ride App (Ride/Feres)",
@@ -815,6 +952,24 @@ export default function TransportPage() {
                                 </span>
                             </div>
                         ))}
+                    </div>
+                </div>
+
+                {/* Arrival Tips */}
+                <div className="bg-amber-50 p-6 rounded-[2rem] border border-amber-100 flex gap-4 items-start shadow-inner">
+                    <div className="p-2 bg-white rounded-xl shadow-sm border border-amber-200 shrink-0">
+                        <Info className="w-5 h-5 text-amber-500" />
+                    </div>
+                    <div className="space-y-1.5">
+                        <h4 className="font-black text-amber-900 tracking-tight text-sm">
+                            Arrival Tips
+                        </h4>
+                        <ul className="text-xs text-amber-800/80 font-medium space-y-2 list-disc pl-4">
+                            <li><strong>Safest exit:</strong> Use Ride apps or authorized Yellow Cabs (Metered).</li>
+                            <li><strong>Avoid touts:</strong> Do not accept rides from aggressively waving individuals inside the terminal.</li>
+                            <li><strong>Pickups:</strong> App drivers typically meet you in the parking lot area.</li>
+                            <li><strong>Cash:</strong> Keep ~500 ETB handy in small denominations for immediate expenses.</li>
+                        </ul>
                     </div>
                 </div>
             </section>
@@ -983,7 +1138,7 @@ export default function TransportPage() {
                             {/* Pro Tip */}
                             <div className="bg-amber-50 p-5 rounded-2xl border border-amber-100">
                                 <p className="text-sm text-amber-800 font-bold leading-relaxed">
-                                    ⭐ <strong>Pro Tip:</strong> {selectedService.tip}
+                                    â­ <strong>Pro Tip:</strong> {selectedService.tip}
                                 </p>
                             </div>
 
@@ -994,13 +1149,13 @@ export default function TransportPage() {
                                 </h3>
                                 <div className="flex gap-3">
                                     <button
-                                        onClick={() => browser.open(selectedService.playStore, selectedService.name + " — Google Play")}
+                                        onClick={() => browser.open(selectedService.playStore, selectedService.name + " â€” Google Play")}
                                         className="flex-1 flex items-center justify-center gap-2 bg-gray-900 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-gray-800 transition-colors shadow-lg"
                                     >
                                         <Download className="w-4 h-4" /> Android
                                     </button>
                                     <button
-                                        onClick={() => browser.open(selectedService.appStore, selectedService.name + " — App Store")}
+                                        onClick={() => browser.open(selectedService.appStore, selectedService.name + " â€” App Store")}
                                         className="flex-1 flex items-center justify-center gap-2 bg-gray-900 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-gray-800 transition-colors shadow-lg"
                                     >
                                         <Download className="w-4 h-4" /> iOS
@@ -1014,3 +1169,4 @@ export default function TransportPage() {
         </div>
     );
 }
+

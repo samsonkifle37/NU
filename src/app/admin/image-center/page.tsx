@@ -1,125 +1,72 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { getPipelineImages, getPipelineStats, updateImageState } from "./actions";
 import {
     RefreshCcw,
-    Search,
     CheckCircle,
     XCircle,
     Image as ImageIcon,
-    ExternalLink,
     AlertTriangle,
-    ArrowRight
+    ShieldCheck,
+    Star,
+    UploadCloud,
+    Search
 } from "lucide-react";
 import { BottomNav } from "@/components/BottomNav";
 
-interface AuditItem {
-    id: string;
-    entityType: string;
-    name: string;
-    imageUrl: string | null;
-    status: string;
-    httpCode: number | null;
-    notes: string | null;
-    primaryImagePresent: boolean;
-    galleryCount: number;
-    mapsLinkPresent: boolean;
-    websitePresent: boolean;
-    contactDetailsPresent: boolean;
-}
-
-export default function ImageRepairCenter() {
-    const [items, setItems] = useState<AuditItem[]>([]);
+export default function ImageHardeningCenter() {
+    const [images, setImages] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [stats, setStats] = useState<any>(null);
-    const [updatingId, setUpdatingId] = useState<string | null>(null);
+    const [filter, setFilter] = useState<'ALL' | 'PENDING' | 'FAILED'>('FAILED');
+    const [processingId, setProcessingId] = useState<string|null>(null);
 
     useEffect(() => {
-        fetchAudit();
-    }, []);
+        fetchData();
+    }, [filter]);
 
-    const fetchAudit = async () => {
+    const fetchData = async () => {
         setLoading(true);
-        try {
-            const res = await fetch("/api/admin/images/audit");
-            const data = await res.json();
-            setItems(data.items);
-            setStats(data.stats);
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setLoading(false);
-        }
+        const [imgs, st] = await Promise.all([getPipelineImages(filter), getPipelineStats()]);
+        setImages(imgs);
+        setStats(st);
+        setLoading(false);
     };
 
-    const handleUpdateImage = async (id: string, newUrl: string) => {
-        setUpdatingId(id);
-        const adminSecret = "addisview_seed_secret_2026";
-        try {
-            const res = await fetch(`/api/admin/images/update`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${adminSecret}`
-                },
-                body: JSON.stringify({ id, imageUrl: newUrl })
-            });
-            if (res.ok) {
-                fetchAudit();
-            } else {
-                const data = await res.json();
-                alert(`Error: ${data.error || "Update failed"}`);
-            }
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setUpdatingId(null);
-        }
+    const handleAction = async (id: string, action: 'APPROVE' | 'REJECT' | 'SET_PRIMARY' | 'RETRY', newUrl?: string) => {
+        setProcessingId(id);
+        await updateImageState(id, action, newUrl);
+        await fetchData();
+        setProcessingId(null);
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 pb-24">
-            <header className="bg-white border-b border-gray-100 sticky top-0 z-10">
-                <div className="max-w-4xl mx-auto px-6 py-8">
+        <div className="min-h-screen bg-[#0B0F19] pb-24 text-white">
+            <header className="bg-white/5 border-b border-white/10 sticky top-0 z-10 backdrop-blur-md">
+                <div className="max-w-6xl mx-auto px-6 py-6 border-l-4 border-[#D4AF37]">
                     <div className="flex justify-between items-center">
                         <div>
-                            <h1 className="text-3xl font-black text-gray-900 tracking-tight">Image Repair Center</h1>
-                            <p className="text-gray-500 text-sm mt-1 font-medium">Identify and fix broken/missing images.</p>
+                            <h1 className="text-3xl font-black text-white flex items-center gap-3">
+                                <ShieldCheck className="w-8 h-8 text-[#D4AF37]" strokeWidth={2.5} />
+                                Image Quality Center
+                            </h1>
+                            <p className="text-gray-400 text-sm mt-1 font-medium">Phase 2: Source-Safe Mirroring and Primary Injection</p>
                         </div>
                         <div className="flex gap-2">
+                             <select 
+                                value={filter} 
+                                onChange={(e)=>setFilter(e.target.value as any)}
+                                className="bg-[#1A1A2E] text-white p-2.5 rounded-xl border border-white/20 text-xs font-black uppercase tracking-widest focus:border-[#D4AF37]"
+                             >
+                                 <option value="FAILED">Review FAILED</option>
+                                 <option value="PENDING">Review PENDING</option>
+                                 <option value="ALL">View ALL</option>
+                             </select>
                             <button
-                                onClick={async () => {
-                                    const adminSecret = "addisview_seed_secret_2026"; // Hardcoded for this demo, usually should be from state or cookie
-                                    setLoading(true);
-                                    try {
-                                        const res = await fetch("/api/admin/images/bulk-process", {
-                                            method: "POST",
-                                            headers: {
-                                                "Content-Type": "application/json",
-                                                "Authorization": `Bearer ${adminSecret}`
-                                            },
-                                            body: JSON.stringify({ batchFile: "sourced_images_final.json" })
-                                        });
-                                        const data = await res.json();
-                                        alert(`Batch Processed: ${data.results?.filter((r: any) => r.success).length}/${data.total} succeeded.`);
-                                        fetchAudit();
-                                    } catch (err) {
-                                        alert("Failed to process batch");
-                                    } finally {
-                                        setLoading(false);
-                                    }
-                                }}
+                                onClick={fetchData}
                                 disabled={loading}
-                                className="px-6 py-3 bg-emerald-600 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl hover:bg-emerald-700 transition-all disabled:opacity-50 active:scale-95 flex items-center gap-2"
-                            >
-                                <ArrowRight className="w-4 h-4" />
-                                Process Batch 1
-                            </button>
-
-                            <button
-                                onClick={fetchAudit}
-                                disabled={loading}
-                                className="p-3 bg-gray-900 text-white rounded-2xl hover:bg-gray-800 transition-all disabled:opacity-50 active:scale-95"
+                                className="p-2.5 bg-[#D4AF37] text-[#1A1A2E] rounded-xl hover:opacity-80 transition-all disabled:opacity-50"
                             >
                                 <RefreshCcw className={`w-5 h-5 ${loading ? "animate-spin" : ""}`} />
                             </button>
@@ -127,116 +74,115 @@ export default function ImageRepairCenter() {
                     </div>
 
                     {stats && (
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-                            <div className="bg-emerald-50 rounded-2xl p-4 border border-emerald-100/50">
-                                <span className="text-[10px] uppercase font-black tracking-widest text-emerald-600 block mb-1">Healthy</span>
-                                <span className="text-2xl font-black text-emerald-700">{stats.find((s: any) => s.status === 'ok')?._count.id || 0}</span>
+                        <div>
+                            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-6">
+                                <div className="bg-gray-500/10 rounded-xl p-3 border border-gray-500/20">
+                                    <span className="text-[10px] uppercase font-black tracking-widest text-gray-400 block">Total Catalog</span>
+                                    <span className="text-2xl font-black text-white">{stats.totalCount || 0}</span>
+                                </div>
+                                <div className="bg-emerald-500/10 rounded-xl p-3 border border-emerald-500/20">
+                                    <span className="text-[10px] uppercase font-black tracking-widest text-emerald-500 block">Approved</span>
+                                    <span className="text-2xl font-black text-white">{stats.groups.find((s:any)=>s.status==='APPROVED')?._count.id || 0}</span>
+                                </div>
+                                <div className="bg-rose-500/10 rounded-xl p-3 border border-rose-500/20">
+                                    <span className="text-[10px] uppercase font-black tracking-widest text-rose-500 block">Failed / Blocked</span>
+                                    <span className="text-2xl font-black text-white">{stats.groups.find((s:any)=>s.status==='FAILED')?._count.id || 0}</span>
+                                </div>
+                                <div className="bg-blue-500/10 rounded-xl p-3 border border-blue-500/20">
+                                    <span className="text-[10px] uppercase font-black tracking-widest text-blue-500 block flex items-center gap-1">Pending Queue</span>
+                                    <span className="text-2xl font-black text-white">{stats.groups.find((s:any)=>s.status==='PENDING')?._count.id || 0}</span>
+                                </div>
+                                <div className="bg-[#D4AF37]/10 rounded-xl p-3 border border-[#D4AF37]/30">
+                                    <span className="text-[10px] uppercase font-black tracking-widest text-[#D4AF37] block flex items-center gap-1"><UploadCloud className="w-3 h-3"/> Mirrored Safe</span>
+                                    <span className="text-2xl font-black text-white">{stats.mirroredCount}</span>
+                                </div>
                             </div>
-                            <div className="bg-amber-50 rounded-2xl p-4 border border-amber-100/50">
-                                <span className="text-[10px] uppercase font-black tracking-widest text-amber-600 block mb-1">Missing</span>
-                                <span className="text-2xl font-black text-amber-700">{stats.find((s: any) => s.status === 'missing')?._count.id || 0}</span>
-                            </div>
-                            <div className="bg-rose-50 rounded-2xl p-4 border border-rose-100/50">
-                                <span className="text-[10px] uppercase font-black tracking-widest text-rose-600 block mb-1">Broken</span>
-                                <span className="text-2xl font-black text-rose-700">{stats.find((s: any) => s.status === 'broken')?._count.id || 0}</span>
-                            </div>
-                            <div className="bg-orange-50 rounded-2xl p-4 border border-orange-100/50">
-                                <span className="text-[10px] uppercase font-black tracking-widest text-orange-600 block mb-1">Blocked (403)</span>
-                                <span className="text-2xl font-black text-orange-700">{stats.find((s: any) => s.status === 'blocked')?._count.id || 0}</span>
+                            <div className="mt-4 flex gap-4 text-[10px] font-mono text-gray-500">
+                                <span>LAST PIPELINE RUN: {stats.lastRunAt ? new Date(stats.lastRunAt).toLocaleString() : 'Never'}</span>
+                                {stats.groups.find((s:any)=>s.status==='PENDING')?._count.id === 0 ? (
+                                     <span className="text-emerald-500 flex items-center gap-1"><CheckCircle className="w-3 h-3"/> QUEUE EMPTY (COMPLETED)</span>
+                                ) : (
+                                     <span className="text-blue-400 flex items-center gap-1"><RefreshCcw className="w-3 h-3 animate-spin"/> PROCESSING BACKLOG...</span>
+                                )}
                             </div>
                         </div>
                     )}
                 </div>
             </header>
 
-            <main className="max-w-4xl mx-auto px-6 py-8">
+            <main className="max-w-6xl mx-auto px-6 py-8">
                 {loading ? (
                     <div className="flex flex-col items-center justify-center py-20 gap-4">
-                        <div className="w-12 h-12 border-4 border-gray-900 border-t-transparent rounded-full animate-spin"></div>
-                        <p className="font-bold text-gray-400 uppercase tracking-widest text-xs">Scanning Gallery...</p>
+                        <div className="w-12 h-12 border-4 border-[#D4AF37] border-t-transparent rounded-full animate-spin"></div>
+                        <p className="font-bold text-[#D4AF37] uppercase tracking-widest text-xs">Scanning Database...</p>
+                    </div>
+                ) : images.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-20 gap-4 border border-dashed border-white/10 rounded-[2rem]">
+                        <CheckCircle className="w-12 h-12 text-emerald-500/50" />
+                        <p className="font-bold text-gray-500 uppercase tracking-widest text-xs">No images found in this filter state.</p>
                     </div>
                 ) : (
                     <div className="grid gap-6">
-                        {items.map((item) => (
-                            <div key={item.id} className="bg-white rounded-[2rem] p-6 border border-gray-100 shadow-sm flex flex-col md:flex-row gap-6 hover:shadow-xl hover:shadow-gray-200/40 transition-all duration-500 group">
-                                <div className="w-full md:w-32 h-32 rounded-2xl bg-gray-50 flex-shrink-0 relative overflow-hidden flex items-center justify-center border border-gray-100">
-                                    {item.imageUrl && item.status !== 'missing' ? (
-                                        <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
+                        {images.map((img) => (
+                            <div key={img.id} className="bg-[#1A1A2E]/50 rounded-[2rem] p-6 border border-white/5 flex flex-col md:flex-row gap-6 hover:border-[#D4AF37]/30 transition-all duration-300">
+                                
+                                <div className="w-full md:w-48 h-32 rounded-2xl bg-black flex-shrink-0 relative overflow-hidden flex items-center justify-center border border-white/10 group">
+                                    {img.mirroredUrl || img.imageUrl ? (
+                                        <img src={img.mirroredUrl || img.imageUrl} alt="Asset" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
                                     ) : (
-                                        <ImageIcon className="w-8 h-8 text-gray-200" />
+                                        <ImageIcon className="w-8 h-8 text-gray-700" />
                                     )}
-                                    <div className={`absolute top-2 right-2 p-1 rounded-full ${item.status === 'ok' ? 'bg-emerald-500' :
-                                        item.status === 'broken' ? 'bg-rose-500' :
-                                            item.status === 'blocked' ? 'bg-orange-500' : 'bg-amber-500'
-                                        }`}>
-                                        {item.status === 'ok' ? <CheckCircle className="w-3 h-3 text-white" /> : <AlertTriangle className="w-3 h-3 text-white" />}
+                                    <div className={`absolute top-2 right-2 px-2 py-0.5 rounded text-[9px] font-black uppercase ${img.status === 'APPROVED' ? 'bg-emerald-500 text-black' : img.status === 'FAILED' ? 'bg-rose-500 text-white' : 'bg-gray-500 text-white'}`}>
+                                        {img.status}
                                     </div>
+                                    {img.priority === 0 && <div className="absolute top-2 left-2 bg-[#D4AF37] text-black px-2 py-0.5 rounded text-[9px] font-black uppercase flex items-center gap-1"><Star className="w-3 h-3 fill-black"/> Primary Hero</div>}
                                 </div>
 
                                 <div className="flex-1 min-w-0">
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-[9px] font-black uppercase tracking-widest bg-gray-100 text-gray-500 px-2 py-1 rounded-md">{item.entityType}</span>
-                                        <h3 className="text-xl font-black text-gray-900 truncate">{item.name}</h3>
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <span className="text-[9px] font-black uppercase tracking-widest bg-white/10 text-gray-300 px-2 py-0.5 rounded">{img.place?.type || 'Place'}</span>
+                                        <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded flex items-center gap-1 ${img.isMirrored ? 'bg-[#D4AF37]/20 text-[#D4AF37]' : 'bg-rose-500/20 text-rose-300'}`}>
+                                           <UploadCloud className="w-3 h-3" /> {img.isMirrored ? 'Mirrored Safe' : 'External Only'}
+                                        </span>
+                                        <h3 className="text-lg font-black text-white truncate ml-2">{img.place?.name}</h3>
                                     </div>
-                                    <p className="text-gray-400 text-xs mt-1 truncate">Current URL: {item.imageUrl || "None"}</p>
-
-                                    {item.notes && (
-                                        <div className={`mt-3 p-3 rounded-xl border flex items-start gap-2 ${item.status === 'blocked' ? 'bg-orange-50 border-orange-100' : 'bg-rose-50 border-rose-100'
-                                            }`}>
-                                            <AlertTriangle className={`w-4 h-4 mt-0.5 ${item.status === 'blocked' ? 'text-orange-500' : 'text-rose-500'
-                                                }`} />
-                                            <p className={`text-xs font-medium leading-normal ${item.status === 'blocked' ? 'text-orange-700' : 'text-rose-700'
-                                                }`}>{item.notes}</p>
+                                    
+                                    <p className="text-gray-400 text-xs truncate">Source URL: {img.imageUrl}</p>
+                                    
+                                    {img.rejectionReason && (
+                                        <div className="mt-3 p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-start gap-2">
+                                            <AlertTriangle className="w-4 h-4 mt-0.5 text-rose-500" />
+                                            <div>
+                                                <p className="text-xs font-bold text-rose-400">{img.rejectionReason}</p>
+                                                {img.hash && <p className="text-[10px] text-rose-700/60 font-mono mt-1">Hash: {img.hash}</p>}
+                                            </div>
+                                        </div>
+                                    )}
+                                    
+                                    {img.status === 'APPROVED' && (
+                                        <div className="mt-3 flex gap-4 text-[10px] uppercase font-bold text-gray-400">
+                                            <span>Score: <span className="text-[#D4AF37]">{img.qualityScore}</span></span>
+                                            <span>Dimensions: <span className="text-white">{img.width}x{img.height}</span></span>
+                                            {img.labels?.length > 0 && <span>Labels: <span className="text-white">{img.labels.join(', ')}</span></span>}
                                         </div>
                                     )}
 
-                                    {/* Entity Content Completeness Dashboard */}
-                                    <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-gray-100">
-                                        <div className={`text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded-md flex items-center gap-1 ${item.primaryImagePresent ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-rose-50 text-rose-600 border border-rose-100'}`}>
-                                            {item.primaryImagePresent ? <CheckCircle className="w-3 h-3" /> : <XCircle className="w-3 h-3" />} Primary Image
-                                        </div>
-                                        <div className="text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded-md bg-gray-50 text-gray-600 border border-gray-200 flex items-center gap-1">
-                                            <ImageIcon className="w-3 h-3" /> Gallery: {item.galleryCount}
-                                        </div>
-                                        <div className={`text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded-md flex items-center gap-1 ${item.mapsLinkPresent ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-rose-50 text-rose-600 border border-rose-100'}`}>
-                                            {item.mapsLinkPresent ? <CheckCircle className="w-3 h-3" /> : <XCircle className="w-3 h-3" />} Maps Link
-                                        </div>
-                                        <div className={`text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded-md flex items-center gap-1 ${item.websitePresent ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-gray-50 text-gray-400 border border-gray-100'}`}>
-                                            {item.websitePresent ? <CheckCircle className="w-3 h-3" /> : <XCircle className="w-3 h-3" />} Website
-                                        </div>
-                                        <div className={`text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded-md flex items-center gap-1 ${item.contactDetailsPresent ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-gray-50 text-gray-400 border border-gray-100'}`}>
-                                            {item.contactDetailsPresent ? <CheckCircle className="w-3 h-3" /> : <XCircle className="w-3 h-3" />} Contact Details
-                                        </div>
-                                    </div>
-
-                                    <div className="mt-4 flex flex-col gap-2">
-                                        <div className="flex gap-2">
-                                            <input
-                                                type="text"
-                                                placeholder="Paste new image URL..."
-                                                className="flex-1 bg-gray-50 border border-gray-100 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 transition-all"
-                                                onKeyDown={(e) => {
-                                                    if (e.key === 'Enter') {
-                                                        handleUpdateImage(item.id, (e.target as HTMLInputElement).value);
-                                                        (e.target as HTMLInputElement).value = "";
-                                                    }
-                                                }}
-                                            />
-                                            <button className="bg-gray-100 hover:bg-gray-200 p-2 rounded-xl transition-colors">
-                                                <Search className="w-4 h-4 text-gray-600" />
-                                            </button>
-                                        </div>
-
-                                        {item.imageUrl && (
-                                            <button
-                                                onClick={() => handleUpdateImage(item.id, item.imageUrl!)}
-                                                disabled={updatingId === item.id}
-                                                className="w-full bg-gray-900 text-white text-[10px] font-black uppercase tracking-widest py-2 rounded-xl hover:bg-gray-800 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
-                                            >
-                                                {updatingId === item.id ? <RefreshCcw className="w-3 h-3 animate-spin" /> : <RefreshCcw className="w-3 h-3" />}
-                                                Mirror current URL to Supabase
-                                            </button>
-                                        )}
+                                    <div className="mt-4 flex flex-wrap gap-2">
+                                        <input
+                                            type="text"
+                                            placeholder="Paste new URL to override..."
+                                            className="bg-black/40 border border-white/10 rounded-lg px-3 py-1.5 text-xs focus:ring-1 focus:ring-[#D4AF37] w-48"
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') {
+                                                    handleAction(img.id, 'RETRY', (e.target as HTMLInputElement).value);
+                                                    (e.target as HTMLInputElement).value = "";
+                                                }
+                                            }}
+                                        />
+                                        
+                                        {img.status !== 'APPROVED' && <button onClick={() => handleAction(img.id, 'APPROVE')} disabled={processingId===img.id} className="text-[10px] bg-emerald-500/20 hover:bg-emerald-500/40 text-emerald-400 font-bold uppercase px-3 py-1.5 rounded-lg border border-emerald-500/30 transition-all">Force Approve</button>}
+                                        {img.status !== 'FAILED' && <button onClick={() => handleAction(img.id, 'REJECT')} disabled={processingId===img.id} className="text-[10px] bg-rose-500/20 hover:bg-rose-500/40 text-rose-400 font-bold uppercase px-3 py-1.5 rounded-lg border border-rose-500/30 transition-all">Reject Image</button>}
+                                        {img.status === 'APPROVED' && img.priority !== 0 && <button onClick={() => handleAction(img.id, 'SET_PRIMARY')} disabled={processingId===img.id} className="text-[10px] bg-[#D4AF37]/20 hover:bg-[#D4AF37]/40 text-[#D4AF37] font-bold uppercase px-3 py-1.5 rounded-lg border border-[#D4AF37]/30 transition-all">Set Primary Hero</button>}
                                     </div>
                                 </div>
                             </div>

@@ -7,11 +7,12 @@ export async function GET(request: NextRequest) {
         const type = searchParams.get("type"); // comma-separated: hotel,guesthouse
         const city = searchParams.get("city");
         const search = searchParams.get("search");
+        const neighborhood = searchParams.get("neighborhood"); // area/neighbourhood filter
         const limit = parseInt(searchParams.get("limit") || "50");
         const offset = parseInt(searchParams.get("offset") || "0");
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const where: any = { isActive: true };
+        const where: any = { isActive: true, status: 'APPROVED' };
 
         if (type) {
             const types = type.split(",").map((t) => t.trim());
@@ -31,13 +32,30 @@ export async function GET(request: NextRequest) {
             where.city = { contains: city, mode: "insensitive" };
         }
 
+        if (neighborhood) {
+            where.AND = [
+                ...(Array.isArray(where.AND) ? where.AND : []),
+                {
+                    OR: [
+                        { area: { contains: neighborhood, mode: "insensitive" } },
+                        { neighborhood: { contains: neighborhood, mode: "insensitive" } },
+                    ]
+                }
+            ];
+        }
+
         if (search) {
-            where.OR = [
-                { name: { contains: search, mode: "insensitive" } },
-                { shortDescription: { contains: search, mode: "insensitive" } },
-                { city: { contains: search, mode: "insensitive" } },
-                { area: { contains: search, mode: "insensitive" } },
-                { tags: { hasSome: [search.toLowerCase()] } },
+            where.AND = [
+                ...(Array.isArray(where.AND) ? where.AND : []),
+                {
+                    OR: [
+                        { name: { contains: search, mode: "insensitive" } },
+                        { shortDescription: { contains: search, mode: "insensitive" } },
+                        { city: { contains: search, mode: "insensitive" } },
+                        { area: { contains: search, mode: "insensitive" } },
+                        { tags: { hasSome: [search.toLowerCase()] } },
+                    ]
+                }
             ];
         }
 
@@ -51,7 +69,12 @@ export async function GET(request: NextRequest) {
                     },
                     _count: { select: { reviews: true, favorites: true } },
                 },
-                orderBy: { createdAt: "desc" },
+                orderBy: [
+                    { ownerVerified: "desc" },
+                    { featured: "desc" },
+                    { verificationScore: "desc" },
+                    { createdAt: "desc" }
+                ],
                 take: limit,
                 skip: offset,
             }),

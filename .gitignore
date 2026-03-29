@@ -44,3 +44,31 @@ next-env.d.ts
 
 .vercel
 .env*.local
+
+# temporary scripts and logs
+/tmp/
+*.log
+tmp.log
+tmp2.log
+build.log
+error.log
+error2.log
+deploy.sql
+prisma2.log
+prisma_error.log
+publish_err.log
+publish_err_utf8.log
+duplicate_audit.log
+verify_report.txt
+
+# misc scripts
+find_transcript.py
+read_transcript.py
+fix_i18n*.py
+fix_profile*.py
+read_i18n*.py
+scan*_profile.py
+
+# nu crawler
+/nu_crawler/
+/lists/

@@ -1,13 +1,13 @@
 @import "tailwindcss";
 
 @theme {
-  --font-ethiopia: "Outfit", sans-serif;
-  --color-ethiopia-green: #078930;
-  --color-ethiopia-yellow: #FCDD09;
-  --color-ethiopia-red: #DA121A;
-  --color-brand-dark: #0f172a;
-  --color-brand-muted: #64748b;
-  --color-surface: #f8fafc;
+  --font-ethiopia: "Inter", sans-serif;
+  --color-ethiopia-green: #D4A437;
+  --color-ethiopia-yellow: #D4A437;
+  --color-ethiopia-red: #0B0F19;
+  --color-brand-dark: #0B0F19;
+  --color-brand-muted: #D4A437;
+  --color-surface: #F4E7CF;
 }
 
 @layer base {

@@ -51,7 +51,7 @@ export default function ImportPage() {
         <div className="max-w-xl mx-auto py-12 px-6">
             <h1 className="text-3xl font-black mb-6">Seed DB (v2.5)</h1>
             <p className="text-gray-500 mb-8">
-                Upload the <code>addisview_seed_places.json</code> file to import places.
+                Upload the <code>nu_seed_places.json</code> file to import places.
             </p>
 
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col gap-6">
